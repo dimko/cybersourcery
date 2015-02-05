@@ -40,6 +40,14 @@ module Cybersourcery
       data
     end
 
+    def fingerprint
+      @_fingerprint ||= Fingerprint.new(fingerprint_id)
+    end
+
+    def fingerprint_id
+      SecureRandom.uuid
+    end
+
     def current_time
       Time.now.utc.strftime('%Y-%m-%dT%H:%M:%SZ')
     end

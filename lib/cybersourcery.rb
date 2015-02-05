@@ -10,7 +10,7 @@ module Cybersourcery
   include ActiveSupport::Configurable
 
   config_accessor(:endpoint) { 'https://testsecureacceptance.cybersource.com/silent/pay' }
-  config_accessor(:profile_id, :access_key, :secret_key, :merchant)
+  config_accessor(:profile_id, :access_key, :secret_key, :merchant, :merchant_name)
   config_accessor(:transaction_type) { 'sale' }
   config_accessor(:payment_method) { 'card' }
   config_accessor(:locale) { 'en-us' }

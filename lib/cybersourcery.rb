@@ -1,6 +1,7 @@
 require 'active_support'
 
 require 'cybersourcery/payment'
+require 'cybersourcery/payment/fingerprint'
 require 'cybersourcery/signer'
 require 'cybersourcery/version'
 

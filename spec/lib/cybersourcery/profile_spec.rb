@@ -57,17 +57,17 @@ describe Cybersourcery::Profile do
 
     it 'raises an exception if the "service" value is not "live" or "test"' do
       expect { build_profile(service: 'foo') }
-        .to raise_exception Cybersourcery::CybersourceryError
+        .to raise_exception Cybersourcery::Error
     end
 
     it 'raises an exception if the "endpoint_type" is not valid' do
       expect { build_profile(endpoint_type: 'foo') }
-        .to raise_exception(Cybersourcery::CybersourceryError)
+        .to raise_exception(Cybersourcery::Error)
     end
 
     it 'raises an exception if any setting is missing' do
       expect { build_profile(access_key: nil) }
-        .to raise_exception(Cybersourcery::CybersourceryError)
+        .to raise_exception(Cybersourcery::Error)
     end
   end
 
@@ -84,14 +84,14 @@ describe Cybersourcery::Profile do
     context 'when it is not one of Profile::LOCALES' do
       it 'must not be one of Profile::LOCALES' do
         expect { build_profile(locale: 'ab-cd') }
-          .to raise_exception(Cybersourcery::CybersourceryError)
+          .to raise_exception(Cybersourcery::Error)
       end
     end
 
     context 'when it is nil' do
       it 'must not be one of Profile::LOCALES' do
         expect { build_profile(locale: nil) }
-          .to raise_exception(Cybersourcery::CybersourceryError)
+          .to raise_exception(Cybersourcery::Error)
       end
     end
   end

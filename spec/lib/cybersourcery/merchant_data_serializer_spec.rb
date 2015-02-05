@@ -49,14 +49,14 @@ describe Cybersourcery::MerchantDataSerializer do
       serializer = described_class.new(90)
       expect do
         serializer.serialize(merchant_data)
-      end.to raise_exception Cybersourcery::CybersourceryError
+      end.to raise_exception Cybersourcery::Error
     end
 
     it 'raises an exception if the count of merchant fields is less than 1' do
       serializer = described_class.new(0)
       expect do
         serializer.serialize(merchant_data)
-      end.to raise_exception Cybersourcery::CybersourceryError
+      end.to raise_exception Cybersourcery::Error
     end
   end
 

@@ -1,43 +1,47 @@
 module Cybersourcery
   class Payment
-    # These are dependencies for ActiveModel::Errors in the initialize method
-    extend ActiveModel::Naming
-    extend ActiveModel::Translation
     include ActiveModel::Validations
 
-    # So we can use form_for in a view
-    include ActiveModel::Conversion
+    IGNORE_FIELDS = [:commit, :utf8, :authenticity_token, :action, :controller]
 
-    attr_reader :signer, :profile, :params, :errors
-    attr_accessor :bill_to_forename, :bill_to_surname, :card_number, :card_expiry_date,
-                  :card_expiry_month, :card_expiry_year, :card_type,
-                  :bill_to_email, :bill_to_address_line1, :bill_to_address_line2,
-                  :bill_to_address_city, :bill_to_address_state, :bill_to_address_postal_code
-    validates_presence_of :bill_to_forename, :bill_to_surname, :card_number, :card_expiry_date,
-                          :card_expiry_month, :card_expiry_year, :card_type, :bill_to_email,
-                          :bill_to_address_line1, :bill_to_address_city, :bill_to_address_state,
-                          :bill_to_address_postal_code
+    attr_reader :params
 
-    # To keep ActiveModel::Conversion happy
-    def persisted?
-      false
-    end
+    delegate :config, :sign, to: :Cybersourcery
+    delegate :endpoint, to: :config
 
-    def initialize(signer, profile, params)
-      @signer = signer
-      @profile = profile
+    def initialize(params)
       @params = params
-      # I'm not doing dependency injection for ActiveModel dependencies.
-      # Given we're extending ActiveModel::Naming above, we're already tightly bound...
-      @errors = ActiveModel::Errors.new(self)
     end
 
-    def form_action_url
-      @profile.transaction_url
+    def default_params
+      {
+        profile_id: config.profile_id,
+        access_key: config.access_key,
+        payment_method: config.payment_method,
+        transaction_type: config.transaction_type,
+        locale: config.locale
+      }
     end
 
-    def signed_fields
-      @signer.add_and_sign_fields(@params)
+    def signed_params
+      data = default_params.reverse_merge \
+        unsigned_field_names: config.unsigned_field_names.join(','),
+        transaction_uuid: SecureRandom.uuid,
+        reference_number: SecureRandom.uuid,
+        signed_date_time: current_time,
+        signed_field_names: nil
+
+      data.delete_if do |key, _|
+        config.unsigned_field_names.include?(key) || IGNORE_FIELDS.include?(key)
+      end
+
+      data[:signed_field_names] = data.keys.join(',')
+      data[:signature] = sign(data)
+      data
+    end
+
+    def current_time
+      Time.now.utc.strftime('%Y-%m-%dT%H:%M:%SZ')
     end
   end
 end

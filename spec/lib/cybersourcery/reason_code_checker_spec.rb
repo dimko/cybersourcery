@@ -8,14 +8,14 @@ describe Cybersourcery::ReasonCodeChecker do
 
     it 'raises an exception for a known error code' do
       expect { described_class.run!('101') }.to raise_exception(
-        Cybersourcery::CybersourceryError,
+        Cybersourcery::Error,
         'Declined: The request is missing one or more required fields.'
       )
     end
 
     it 'raises an exception for an unknown error code' do
       expect { described_class.run!('600') }.to raise_exception(
-        Cybersourcery::CybersourceryError,
+        Cybersourcery::Error,
         'Declined: unknown reason (code 600)'
       )
     end

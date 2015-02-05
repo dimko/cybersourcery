@@ -28,7 +28,7 @@ If you download the gem with its development dependencies, you will get a workin
   ```ruby
   gem 'cybersourcery'
   ```
-  
+
   ```console
   bundle
   ```
@@ -38,7 +38,7 @@ If you download the gem with its development dependencies, you will get a workin
   ```console
   rails generate cybersourcery:config
   ```
-  
+
   This generates 2 files: `config/cybersourcery_profiles.yml` and `config/initializers/cybersourcery.rb`.
 
 3. Add information about your Cybersource profiles to the `config/cybersourcery_profiles.yml` file. You must first create these profiles in the Cybersource Business Center. We recommend that **you do not check this file into version control**, since it will contain sensitive data about your Cybersource profiles.
@@ -65,7 +65,7 @@ If you download the gem with its development dependencies, you will get a workin
 ## Tests
 
 If you have installed Cybersourcery with its development dependencies, you will also get the Cybersourcery Testing gem, which will allow you to run all the tests. First, start the Cybersource proxy server:
-  
+
 ```console
 cd spec/demo
 rake cybersourcery:proxy
@@ -94,7 +94,7 @@ The first argument is the profile ID for the Cybersource profile you want to use
 The second argument is typically the controller's `params` field. You can of course substitute an analogous data structure. The params will be added to the credit card form's hidden inputs and will be included in the list of signed fields. A couple important notes:
 
 * For a successful transaction, the params must include an `amount`.
-* The params should not include any of fields in the `cybersourcery_profiles.yml` file's list of unsigned fields. 
+* The params should not include any of fields in the `cybersourcery_profiles.yml` file's list of unsigned fields.
 
 The third argument is optional. It can be the name of a subclass you create, derived from [the Payment model](https://github.com/promptworks/cybersourcery/blob/master/lib/cybersourcery/payment.rb) included with Cybersourcery. This non-persisted model has attributes for the minimal set of fields in a credit card form, including billing address information. You can create a subclass for adding shipping address fields, phone number, etc. [Here is an example subclass](https://github.com/promptworks/cybersourcery/blob/master/spec/demo/app/models/my_payment.rb).
 
@@ -109,7 +109,7 @@ Key points:
 * Cybersourcery provides support for HTML5 front-end validation, but no specific approach to front-end form validation is required. As mentioned above, you can subclass the non-persisted Payment model to add your own fields and indicate which are required.
 * The optional call to the `add_expiry_date_fields` helper method makes it easy to include a month and date picker in your form that's [appropriate for indicating credit card expiry dates](http://baymard.com/blog/how-to-format-expiration-date-fields). Used in conjunction with [this javascript from the demo project](https://github.com/promptworks/cybersourcery/blob/master/spec/demo/app/assets/javascripts/payments.js.coffee), it will then submit a date in the user-unfriendly format that Cybersource requires.
 * The javascript file in the demo project also provides dynamic switching of the input type for the "State" field, based on whether the US is selected as the country (it provides a select list of states for the US, or a text input field for other countries).
-* The `field_pattern` and `field_validation_message` methods in the [PaymentsHelper](https://github.com/promptworks/cybersourcery/blob/master/lib/cybersourcery/payments_helper.rb) include only one pattern matching requirement, for the credit card number format. You can add your own pattern matching rules by overriding these methods, [like this](http://stackoverflow.com/questions/10471535/override-rails-helpers-with-access-to-original#10525284). 
+* The `field_pattern` and `field_validation_message` methods in the [PaymentsHelper](https://github.com/promptworks/cybersourcery/blob/master/lib/cybersourcery/payments_helper.rb) include only one pattern matching requirement, for the credit card number format. You can add your own pattern matching rules by overriding these methods, [like this](http://stackoverflow.com/questions/10471535/override-rails-helpers-with-access-to-original#10525284).
 
 ### Handling the transaction response from Cybersource
 
@@ -118,20 +118,20 @@ Key points:
     ```ruby
     skip_before_filter :verify_authenticity_token, only: :confirm
     before_action :normalize_cybersource_params, only: :confirm
-  
+
     [...]
-  
+
     private
-  
+
     def normalize_cybersource_params
       Cybersourcery::CybersourceParamsNormalizer.run(params)
     end
     ```
-  
+
     Since the POST is from Cybersource, there is no reason to check for a Rails authenticity token.
-    
+
     The `CybersourceParamsNormalizer` copies and adds param names that start with "req_", and removes "req_" from them, so they have consistent naming across contexts, which simplifies internal handling.
-  
+
 2. A minimal method for handling the response would look like this:
 
     ```ruby
@@ -139,21 +139,21 @@ Key points:
       signature_checker = Cybersourcery::Container.get_cybersource_signature_checker('pwksgem', params)
       signature_checker.run!
       flash.now[:notice] = Cybersourcery::ReasonCodeChecker::run!(params[:reason_code])
-    rescue Cybersourcery::CybersourceryError => e
+    rescue Cybersourcery::Error => e
       flash.now[:alert] = e.message
     end
     ```
-  
+
     There are three possible outcomes when handling the response from Cybersource:
-    
+
     <ol type="A">
     <li>A successful transaction: the ReasonCodeChecker's <code>run!</code> method returns a user friendly message that the transaction succeeded.</li>
     <li>An exception is raised, if the signature returned from Cybersource does not match: this indicates data tampering.</li>
     <li>An exception is raised, if the transaction failed: this can happen due to an expired credit card, or some other reason.</li>
     </ol>
-    
+
     The `rescue` block will catch either exception, with a user friendly message from the ReasonCodeChecker.
-    
+
     If you prefer to not have exceptions thrown, you can call `run` (without the exclamation point) on the SignatureChecker or the ReasonCodeChecker.
 
 3. Typically, you will want to display the credit card form again if there is a problem with the transaction, so the user can try again. See the [PaymentsController's `confirm` method in the demo project](https://github.com/promptworks/cybersourcery/blob/master/spec/demo/app/controllers/payments_controller.rb) for an example of how to do this.
@@ -177,7 +177,7 @@ def new
   cart_signer = Cybersourcery::Container.get_cart_signer('pwksgem', session, cart_fields)
   @signed_fields = cart_signer.run
 end
-```  
+```
 
 The controller method for displaying your credit card form can receive the POST and check the cart's signature, like this:
 

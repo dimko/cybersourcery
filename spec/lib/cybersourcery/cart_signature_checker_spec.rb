@@ -39,7 +39,7 @@ describe Cybersourcery::CartSignatureChecker do
       )
 
       expect { checker.run! }.to raise_exception(
-        Cybersourcery::CybersourceryError,
+        Cybersourcery::Error,
         'Detected possible data tampering. Signatures do not match.'
       )
     end

@@ -1,5 +1,6 @@
 require 'active_support'
 
+require 'cybersourcery/engine' if defined?(::Rails::Engine)
 require 'cybersourcery/payment'
 require 'cybersourcery/payment/fingerprint'
 require 'cybersourcery/signer'

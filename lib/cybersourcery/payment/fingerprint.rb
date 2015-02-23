@@ -13,8 +13,8 @@ module Cybersourcery
         config.fingerprint_org
       end
 
-      def domain
-        config.fingerprint_domain
+      def endpoint
+        config.fingerprint_endpoint
       end
 
       def sid

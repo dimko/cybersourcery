@@ -17,7 +17,7 @@ module Cybersourcery
   config_accessor(:payment_method) { 'card' }
   config_accessor(:locale) { 'en-us' }
 
-  config_accessor(:fingerprint_domain) { 'h.online-metrix.net' }
+  config_accessor(:fingerprint_endpoint) { 'https://h.online-metrix.net' }
   config_accessor(:fingerprint_org) { '1snn5n9w' }
 
   config_accessor(:unsigned_field_names) do

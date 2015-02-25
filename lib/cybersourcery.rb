@@ -3,6 +3,7 @@ require 'active_support'
 require 'cybersourcery/engine' if defined?(::Rails::Engine)
 require 'cybersourcery/payment'
 require 'cybersourcery/payment/fingerprint'
+require 'cybersourcery/profile'
 require 'cybersourcery/signer'
 require 'cybersourcery/version'
 
@@ -36,9 +37,5 @@ module Cybersourcery
       :card_type,
       :amount
     ]
-  end
-
-  def sign(params, keys = nil)
-    Signer.new(params, keys || params.keys).signature
   end
 end

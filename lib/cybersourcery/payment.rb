@@ -4,22 +4,24 @@ module Cybersourcery
 
     IGNORE_FIELDS = [:commit, :utf8, :authenticity_token, :action, :controller]
 
-    attr_reader :params, :unsigned_field_names, :signed_date_time
+    attr_reader :profile, :params, :unsigned_field_names, :signed_date_time
 
-    delegate :config, :sign, to: :Cybersourcery
+    delegate :config,   to: :profile
     delegate :endpoint, to: :config
 
-    def initialize(params)
+    def initialize(profile, params)
       @unsigned_field_names = params.delete(:unsigned_field_names) || config.unsigned_field_names
-      @signed_date_time = params.delete(:signed_date_time) || Time.now
-      @params = params
+      @signed_date_time     = params.delete(:signed_date_time) || Time.now
+
+      @profile = profile
+      @params  = params
     end
 
-    def defaults
+    def common
       {
         profile_id: config.profile_id,
         access_key: config.access_key,
-        payment_method: config.payment_method,
+        payment_method:   config.payment_method,
         transaction_type: config.transaction_type,
         unsigned_field_names: unsigned_field_names.join(','),
         signed_date_time: signed_date_time.utc.strftime('%Y-%m-%dT%H:%M:%SZ'),
@@ -31,19 +33,19 @@ module Cybersourcery
     end
 
     def signed_params
-      data = params.reverse_merge(defaults)
+      data = common.merge(params)
 
       data.delete_if do |key, _|
         unsigned_field_names.include?(key) || IGNORE_FIELDS.include?(key)
       end
 
       data[:signed_field_names] = data.keys.join(',')
-      data[:signature] = sign(data)
+      data[:signature] = profile.sign(data)
       data
     end
 
     def fingerprint
-      @_fingerprint ||= Fingerprint.new(fingerprint_id) if fingerprint_id
+      @_fingerprint ||= Fingerprint.new(profile, fingerprint_id) if fingerprint_id
     end
 
     def fingerprint_id

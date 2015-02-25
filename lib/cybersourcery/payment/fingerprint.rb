@@ -1,11 +1,12 @@
 module Cybersourcery
   class Payment
     class Fingerprint
-      attr_reader :id
+      attr_reader :profile, :id
 
-      delegate :config, to: :Cybersourcery
+      delegate :config, to: :profile
 
-      def initialize(id)
+      def initialize(profile, id)
+        @profile = profile
         @id = id
       end
 
